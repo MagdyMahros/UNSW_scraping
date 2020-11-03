@@ -100,3 +100,20 @@ for each_url in course_links_file:
             if j.lower() in course_data['Course'].lower():
                 course_data['Faculty'] = i
     print('COURSE FACULTY: ', course_data['Faculty'])
+
+    # COURSE DESCRIPTION
+    desc_header = soup.find('h1', class_='content-section__title display3', text=re.compile('Overview', re.IGNORECASE))
+    if desc_header:
+        desc_list = []
+        desc_div = desc_header.find_next_sibling('div', class_='content-section__column')
+        if desc_div:
+            desc_div_1 = desc_div.find('div', class_='text')
+            if desc_div_1:
+                desc_p_list = desc_div_1.find_all('p')
+                if desc_p_list:
+                    for p in desc_p_list:
+                        desc_list.append(p.get_text().strip())
+                    desc_list = ' '.join(desc_list)
+                    course_data['Description'] = desc_list
+                    print('COURSE DESCRIPTION: ', desc_list)
+
