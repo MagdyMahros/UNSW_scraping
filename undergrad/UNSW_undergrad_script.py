@@ -249,4 +249,27 @@ for each_url in course_links_file:
                 actual_cities.append('paddington')
         print('COURSE LOCATION: ', actual_cities)
 
-
+    # PREREQUISITE
+    prereq_tag = soup.find('dt', class_='metadata-list__title body2', text=re.compile('2021 Guaranteed Entry', re.IGNORECASE))
+    if prereq_tag:
+        prereq_container = prereq_tag.find_parent('div', class_='metadata-list__item')
+        if prereq_container:
+            prereq_dd = prereq_container.find('dd', class_='metadata-list__description display2')
+            if prereq_dd:
+                prereq_div = prereq_dd.find('div')
+                if prereq_div:
+                    prereq_title = prereq_div.find('p')
+                    if prereq_title:
+                        prerequisite = prereq_title.get_text().strip()
+                        atar_ = re.search(r"\d+(?:.\d+)|\d+", prerequisite)
+                        if atar_:
+                            atar = atar_.group()
+                            course_data['Prerequisite_1_grade'] = atar
+                            course_data['Prerequisite_1'] = 'year 12'
+                        else:
+                            course_data['Prerequisite_1_grade'] = 'N/A'
+                            course_data['Prerequisite_1'] = 'N/A'
+        else:
+            course_data['Prerequisite_1_grade'] = 'N/A'
+            course_data['Prerequisite_1'] = 'N/A'
+        print('PREREQUISITE 1: ', course_data['Prerequisite_1_grade'] + ' / ' + course_data['Prerequisite_1'])
