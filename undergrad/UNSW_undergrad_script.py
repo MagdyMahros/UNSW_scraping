@@ -117,3 +117,11 @@ for each_url in course_links_file:
                     course_data['Description'] = desc_list
                     print('COURSE DESCRIPTION: ', desc_list)
 
+    # COURSE LANGUAGE
+    for language in possible_languages:
+        if language in course_data['Course']:
+            course_data['Course_Lang'] = language
+        else:
+            course_data['Course_Lang'] = 'English'
+    print('COURSE LANGUAGE: ', course_data['Course_Lang'])
+
