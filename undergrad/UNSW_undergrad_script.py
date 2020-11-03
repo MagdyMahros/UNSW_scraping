@@ -12,10 +12,7 @@ import time
 from pathlib import Path
 from selenium import webdriver
 import bs4 as bs4
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.by import By
-from selenium.common.exceptions import TimeoutException, NoSuchElementException
+from selenium.webdriver.support.ui import Select
 import os
 import copy
 from CustomMethods import TemplateData
@@ -273,3 +270,66 @@ for each_url in course_links_file:
             course_data['Prerequisite_1_grade'] = 'N/A'
             course_data['Prerequisite_1'] = 'N/A'
         print('PREREQUISITE 1: ', course_data['Prerequisite_1_grade'] + ' / ' + course_data['Prerequisite_1'])
+
+    # FEES
+    # for local
+    fee_section_loc = soup.find('section', id='fees')
+    if fee_section_loc:
+        fee_loc = fee_section_loc.find('dd', class_='content-definition-list__description display3')
+        if fee_loc:
+            fee_loc_n = fee_loc.get_text().replace('$', '').replace('*', '')
+            course_data['Local_Fees'] = fee_loc_n
+        else:
+            course_data['Local_Fees'] = 'Not Available'
+    else:
+        course_data['Local_Fees'] = 'Not Available'
+    # for international
+    # navigate to international section
+    student_type_ = soup.find('select', class_='display2')
+    if student_type_:
+        select = Select(browser.find_element_by_name('student-type'))
+        select.select_by_value('international')
+        time.sleep(1)
+        # grab the data
+        fee_section_int = soup.find('section', id='fees')
+        if fee_section_int:
+            fee_int = fee_section_int.find('dd', class_='content-definition-list__description display3')
+            if fee_int:
+                fee_int_n = fee_int.get_text().replace('$', '').replace('*', '')
+                course_data['Int_Fees'] = fee_int_n
+            else:
+                course_data['Int_Fees'] = 'Not Available'
+        else:
+            course_data['Int_Fees'] = 'Not Available'
+    print('LOCAL FEE: ', course_data['Local_Fees'])
+    print('INTERNATIONAL FEE: ', course_data['Int_Fees'])
+
+    # duplicating entries with multiple cities for each city
+    for i in actual_cities:
+        course_data['City'] = possible_cities[i]
+        course_data_all.append(copy.deepcopy(course_data))
+    del actual_cities
+
+    # TABULATE THE DATA
+    desired_order_list = ['Level_Code', 'University', 'City', 'Course', 'Faculty', 'Int_Fees', 'Local_Fees',
+                          'Currency', 'Currency_Time', 'Duration', 'Duration_Time', 'Full_Time', 'Part_Time',
+                          'Prerequisite_1', 'Prerequisite_2', 'Prerequisite_3', 'Prerequisite_1_grade',
+                          'Prerequisite_2_grade', 'Prerequisite_3_grade', 'Website', 'Course_Lang', 'Availability',
+                          'Description', 'Career_Outcomes', 'Country', 'Online', 'Offline', 'Distance', 'Face_to_Face',
+                          'Blended', 'Remarks']
+
+    course_dict_keys = set().union(*(d.keys() for d in course_data_all))
+
+    with open(csv_file, 'w', encoding='utf-8', newline='') as output_file:
+        dict_writer = csv.DictWriter(output_file, course_dict_keys)
+        dict_writer.writeheader()
+        dict_writer.writerows(course_data_all)
+
+    with open(csv_file, 'r', encoding='utf-8') as infile, open('UNSW_undergrad_ordered.csv', 'w', encoding='utf-8',
+                                                               newline='') as outfile:
+        writer = csv.DictWriter(outfile, fieldnames=desired_order_list)
+        # reorder the header first
+        writer.writeheader()
+        for row in csv.DictReader(infile):
+            # writes the reordered rows to the new file
+            writer.writerow(row)
