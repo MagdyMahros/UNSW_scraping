@@ -40,13 +40,16 @@ csv_file = csv_file_path.__str__() + '/UNSW_undergrad.csv'
 course_data = {'Level_Code': '', 'University': 'University of New South Wales', 'City': '', 'Country': 'Australia',
                'Course': '', 'Int_Fees': '', 'Local_Fees': '', 'Currency': 'AUD', 'Currency_Time': 'year',
                'Duration': '', 'Duration_Time': '', 'Full_Time': '', 'Part_Time': '', 'Prerequisite_1': '',
-               'Prerequisite_2': 'IELTS', 'Prerequisite_3': '', 'Prerequisite_1_grade': '', 'Prerequisite_2_grade': '6.0',
+               'Prerequisite_2': 'IELTS', 'Prerequisite_3': '', 'Prerequisite_1_grade': '',
+               'Prerequisite_2_grade': '6.0',
                'Prerequisite_3_grade': '', 'Website': '', 'Course_Lang': '', 'Availability': '', 'Description': '',
                'Career_Outcomes': '', 'Online': '', 'Offline': '', 'Distance': '', 'Face_to_Face': '',
                'Blended': '', 'Remarks': ''}
 
-possible_cities = {'rockhampton': 'Rockhampton', 'cairns': 'Cairns', 'bundaberg': 'Bundaberg', 'townsville': 'Townsville',
-                   'online': 'Online', 'gladstone': 'Gladstone', 'mackay': 'Mackay', 'mixed': 'Online', 'yeppoon': 'Yeppoon',
+possible_cities = {'rockhampton': 'Rockhampton', 'cairns': 'Cairns', 'bundaberg': 'Bundaberg',
+                   'townsville': 'Townsville',
+                   'online': 'Online', 'gladstone': 'Gladstone', 'mackay': 'Mackay', 'mixed': 'Online',
+                   'yeppoon': 'Yeppoon',
                    'brisbane': 'Brisbane', 'sydney': 'Sydney', 'queensland': 'Queensland', 'melbourne': 'Melbourne',
                    'albany': 'Albany', 'perth': 'Perth', 'adelaide': 'Adelaide', 'noosa': 'Noosa', 'emerald': 'Emerald',
                    'hawthorn': 'Hawthorn', 'wantirna': 'Wantirna', 'prahran': 'Prahran'}
@@ -156,3 +159,34 @@ for each_url in course_links_file:
                             course_data['Duration_Time'] = duration_list[1]
                             print('COURSE DURATION: ', str(duration_list[0]) + ' / ' + duration_list[1])
                         print('FULL-TIME/PART-TIME: ', course_data['Full_Time'] + ' / ' + course_data['Part_Time'])
+
+    # DELIVERY
+    deli_tag = soup.find('dt', class_='metadata-list__title body2', text=re.compile('Delivery Mode', re.IGNORECASE))
+    if deli_tag:
+        deli_container = deli_tag.find_parent('div', class_='metadata-list__item')
+        if deli_container:
+            deli_dd = deli_container.find('dd', class_='metadata-list__description display2')
+            if deli_dd:
+                deli_div = deli_dd.find('div')
+                if deli_div:
+                    deli_ = deli_div.find('p')
+                    if deli_:
+                        delivery = deli_.get_text().strip().lower()
+                        if 'on campus' in delivery:
+                            course_data['Face_to_Face'] = 'yes'
+                            course_data['Offline'] = 'yes'
+                        else:
+                            course_data['Face_to_Face'] = 'no'
+                            course_data['Offline'] = 'no'
+                        if 'online' in delivery:
+                            course_data['Online'] = 'yes'
+                            course_data['Distance'] = 'yes'
+                        else:
+                            course_data['Online'] = 'no'
+                            course_data['Distance'] = 'no'
+                        if 'on campus' in delivery and 'online' in delivery:
+                            course_data['Blended'] = 'yes'
+                        else:
+                            course_data['Blended'] = 'no'
+    print('DELIVERY: online: ' + course_data['Online'] + ' offline: ' + course_data['Offline'] + ' face to face: ' +
+          course_data['Face_to_Face'] + ' blended: ' + course_data['Blended'] + ' distance: ' + course_data['Distance'])
