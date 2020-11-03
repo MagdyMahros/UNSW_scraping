@@ -191,3 +191,23 @@ for each_url in course_links_file:
     print('DELIVERY: online: ' + course_data['Online'] + ' offline: ' + course_data['Offline'] + ' face to face: ' +
           course_data['Face_to_Face'] + ' blended: ' + course_data['Blended'] + ' distance: ' + course_data['Distance'])
 
+    # AVAILABILITY
+    student_type = soup.find('select', class_='display2')
+    if student_type:
+        avi_list = []
+        student_option = student_type.find_all('option')
+        if student_option:
+            for option in student_option:
+                option = option.get_text().lower().strip()
+                avi_list.append(option)
+            if 'domestic student' in avi_list:
+                course_data['Availability'] = 'D'
+            if 'international student' in avi_list:
+                course_data['Availability'] = 'I'
+            if 'international student' in avi_list and 'domestic student' in avi_list:
+                course_data['Availability'] = 'A'
+    else:
+        course_data['Availability'] = 'D'
+    print('AVAILABILITY: ' + course_data['Availability'])
+
+
