@@ -47,12 +47,12 @@ course_data = {'Level_Code': '', 'University': 'University of New South Wales', 
                'Blended': '', 'Remarks': ''}
 
 possible_cities = {'rockhampton': 'Rockhampton', 'cairns': 'Cairns', 'bundaberg': 'Bundaberg',
-                   'townsville': 'Townsville',
+                   'townsville': 'Townsville', 'canberra': 'Canberra', 'paddington': 'Paddington',
                    'online': 'Online', 'gladstone': 'Gladstone', 'mackay': 'Mackay', 'mixed': 'Online',
-                   'yeppoon': 'Yeppoon',
-                   'brisbane': 'Brisbane', 'sydney': 'Sydney', 'queensland': 'Queensland', 'melbourne': 'Melbourne',
-                   'albany': 'Albany', 'perth': 'Perth', 'adelaide': 'Adelaide', 'noosa': 'Noosa', 'emerald': 'Emerald',
-                   'hawthorn': 'Hawthorn', 'wantirna': 'Wantirna', 'prahran': 'Prahran'}
+                   'yeppoon': 'Yeppoon', 'brisbane': 'Brisbane', 'sydney': 'Sydney', 'queensland': 'Queensland',
+                   'melbourne': 'Melbourne', 'albany': 'Albany', 'perth': 'Perth', 'adelaide': 'Adelaide',
+                   'noosa': 'Noosa', 'emerald': 'Emerald', 'hawthorn': 'Hawthorn', 'wantirna': 'Wantirna',
+                   'prahran': 'Prahran', 'kensington': 'Kensington'}
 
 possible_languages = {'Japanese': 'Japanese', 'French': 'French', 'Italian': 'Italian', 'Korean': 'Korean',
                       'Indonesian': 'Indonesian', 'Chinese': 'Chinese', 'Spanish': 'Spanish'}
@@ -226,5 +226,27 @@ for each_url in course_links_file:
                     career_list = ', '.join(career_list)
                     course_data['Career_Outcomes'] = career_list
                     print('CAREER OUTCOMES: ', course_data['Career_Outcomes'])
+
+    # CITY
+    location_container = soup.find_all('div', class_='content-definition-list__item')
+    if location_container:
+        cities = []
+        for element in location_container:
+            location_dd = element.find('dd', class_='content-definition-list__description display3')
+            if location_dd:
+                location_div = location_dd.find('div')
+                if location_div:
+                    location_ = location_div.find('p')
+                    if location_:
+                        location = location_.get_text().strip().lower()
+                        cities.append(location)
+        for city in cities:
+            if 'kensington' in city:
+                actual_cities.append('kensington')
+            if 'canberra' in city:
+                actual_cities.append('canberra')
+            if 'paddington' in city:
+                actual_cities.append('paddington')
+        print('COURSE LOCATION: ', actual_cities)
 
 
