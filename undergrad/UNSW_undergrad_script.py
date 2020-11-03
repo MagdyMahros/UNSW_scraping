@@ -210,4 +210,21 @@ for each_url in course_links_file:
         course_data['Availability'] = 'D'
     print('AVAILABILITY: ' + course_data['Availability'])
 
+    # CAREER OUTCOMES
+    career_title = soup.find('h2', class_='display2', text=re.compile('Career Opportunities', re.IGNORECASE))
+    if career_title:
+        career_list = []
+        list_tag = career_title.find_next('div', class_='text')
+        if list_tag:
+            ul_ = list_tag.find('ul')
+            if ul_:
+                li_ = ul_.find_all('li')
+                if li_:
+                    for li in li_:
+                        career = li.get_text().strip()
+                        career_list.append(career)
+                    career_list = ', '.join(career_list)
+                    course_data['Career_Outcomes'] = career_list
+                    print('CAREER OUTCOMES: ', course_data['Career_Outcomes'])
+
 
