@@ -190,3 +190,4 @@ for each_url in course_links_file:
                             course_data['Blended'] = 'no'
     print('DELIVERY: online: ' + course_data['Online'] + ' offline: ' + course_data['Offline'] + ' face to face: ' +
           course_data['Face_to_Face'] + ' blended: ' + course_data['Blended'] + ' distance: ' + course_data['Distance'])
+
